@@ -70,11 +70,18 @@ vec3 Render_World::Cast_Ray(const Ray& ray,int recursion_depth) const
     Debug_Scope scope; 
     Pixel_Print("cast ray; ray: ",ray);
     std::pair<Shaded_Object, Hit>  temp = Closest_Intersection(ray);
-            vec3 color;
+    vec3 color(0,0,0);
     if ( temp.second.Valid()) {
         vec3 point = ray.Point(temp.second.dist);
-        Pixel_Print("call Shade_Surface with location, ", point, "normal: ",point.normalized());
+        Pixel_Print("call Shade_Surface with location, ", point, "normal: ",temp.first.object->Normal(ray,temp.second));
         color =  temp.first.shader->Shade_Surface(*this,ray, temp.second,point,temp.first.object->Normal(ray,temp.second),recursion_depth);
     }
+
+    else if(background_shader)
+    {
+    Hit temp;
+    color = background_shader->Shade_Surface(*this,ray,temp,vec3(0,0,0),vec3(0,0,0),recursion_depth);
+    }
+ 
     return color;
 }

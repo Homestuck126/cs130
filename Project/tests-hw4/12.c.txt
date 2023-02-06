@@ -1,0 +1,28 @@
+size 640 480
+color red 2 0 0
+color green 0 2 0
+color blue 1 1 4
+color white 1 1 1
+color gray .5 .5 .5
+phong_shader red_shader gray white red 100
+phong_shader blue_shader gray white blue 100
+phong_shader green_shader gray white green 100
+phong_shader white_shader gray white white 50
+phong_shader gray_shader gray gray gray 50
+plane Pg 0 -1 0 0 1 0
+ambient_light white .4
+shaded_object Pg gray_shader
+sphere Sw 0 0 0 .5
+shaded_object Sw white_shader
+sphere Sr 1 0 0 .5
+shaded_object Sr red_shader
+sphere Sg 0 1 0 .5
+shaded_object Sg green_shader
+sphere Sb 0 0 1 .5
+shaded_object Sb blue_shader
+point_light L 0 1 40 white 4500
+enable_shadows 1
+recursion_depth_limit 1
+camera 0 1 6 0 0 0 0 1 0 70
+# GRADING 1 0.10
+# NOTE Phong shading with full scene.

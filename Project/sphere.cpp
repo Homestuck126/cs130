@@ -11,8 +11,7 @@ Sphere::Sphere(const Parse* parse, std::istream& in)
 // Determine if the ray intersects with the sphere
 Hit Sphere::Intersection(const Ray& ray, int part) const
 {
-        Hit intersection;
-
+    Hit intersection;
     //from lecture
     //W = e-c 
     //u = ray direction
@@ -45,8 +44,8 @@ Hit Sphere::Intersection(const Ray& ray, int part) const
 
 vec3 Sphere::Normal(const Ray& ray, const Hit& hit) const
 {
-    vec3 normal;
-    normal = vec3(1,1,1);
+    vec3 point = ray.Point(hit.dist);
+    vec3 normal = (point-this->center).normalized();
     return normal;
 }
 

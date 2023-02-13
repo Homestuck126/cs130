@@ -36,16 +36,17 @@ Shade_Surface(const Render_World& render_world,const Ray& ray,const Hit& hit,
 
     for(unsigned i = 0; i< render_world.lights.size(); i++)
     {
+        // L and R 
         vec3 lightvector = render_world.lights[i]->position - intersection_point;
         vec3 reflectvector = ((2 * (dot (normal, lightvector)) * normal) - lightvector).normalized();
 
         std::pair<Shaded_Object, Hit>  temp;
         if(render_world.enable_shadows)
         {
-
+        //obtain shadow ray
 		Ray Shadow_ray(intersection_point, lightvector);
 		temp = render_world.Closest_Intersection(Shadow_ray);
-		//if there is an object and the light source isnt in between your starting point and your object then return color without specular and diffuse.
+        //check shadow ray intersection
 		if(temp.first.object && temp.second.dist < lightvector.magnitude()){
             Pixel_Print("final color " , color);
 			return color;

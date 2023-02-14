@@ -21,27 +21,80 @@ vec3 Transparent_Shader::
 Shade_Surface(const Render_World& render_world,const Ray& ray,const Hit& hit,
     const vec3& intersection_point,const vec3& normal,int recursion_depth) const
 {
+    Debug_Scope scope;
+    vec3 color;
+    double n1;
+    double n2;
+    bool enter = true;
+    double R0;
+     double R;
+     double entertemp;
+     vec3 b;
+     vec3 t;
     vec3 direction = ray.direction;
     vec3 viewVector = -direction.normalized();
-    double cos1 = dot(viewVector,normal);
-    double sin1 = sqrt(1 - cos1 * cos1 );
-    double sin2 = 1/index_of_refraction * sin1;
-    double cos2 = sqrt(1-1/(index_of_refraction*index_of_refraction) * (1- cos1 * cos1)) ;
+    double cos1 = dot(viewVector,normal);;
+    if(dot(direction, normal) < 0 )
+    {
+    n1 = 1;
+    n2 = index_of_refraction;
+    R0 = pow((n1-n2)/(n1+n2),2);
+    R = R0 + (1-R0)* pow((1-cos1),5);
+    }
+    else
+    {
+        n1 = index_of_refraction;
+        n2 = 1;
+        double power = pow(n1/n2,2);
+         entertemp = dot(viewVector,normal);
+        vec3 t = (n1/n2) * direction + ((n1/n2) * entertemp - sqrt(power * pow(entertemp,2) - (power -1)))*normal;
+        entertemp = dot (t, -normal);
+        R0 = pow((n1-n2)/(n1+n2),2);
+        R = R0 + (1-R0)* pow((1-entertemp),5);
+        enter = false;
+    }
+
+    double sin1 = sqrt(1 - (cos1 * cos1) );
+    double sin2 = n1/n2 * sin1;
+    double cos2 = sqrt(1-(n1*n1/(n2*n2)) * (1- (cos1 * cos1))) ;
+if(enter)
+{
+    b= (viewVector - cos1 * normal) / sin1;
+    t= -cos2 * normal + -sin2 * b;
+}
+else
+{
+     b = (viewVector - cos1 * normal) / sin1;
+     t = cos2 * normal + -sin2 * b;
+}
 
 
-    vec3 b = viewVector - cos1 * normal / sin1;
-    vec3 t = cos2 * -normal + sin2 * -b;
+    vec3 c0 = shader->Shade_Surface (render_world, ray, hit, intersection_point, normal, recursion_depth);
+
+
     Ray transparentRay(intersection_point, t);
 
     vec3 reflectVector = 2 * dot (viewVector, normal) * normal - viewVector;
     Ray reflectionRay(intersection_point, reflectVector);
 
-    vec3 c0 = shader->Shade_Surface (render_world, ray, hit, intersection_point, normal, recursion_depth);
-    vec3 cr = render_world.Cast_Ray(reflectionRay,recursion_depth--);
-    vec3 ct = render_world.Cast_Ray(transparentRay,recursion_depth--);
+    vec3 cr = render_world.Cast_Ray(reflectionRay,recursion_depth++);
+    Pixel_Print("reflected ray; ray: ",reflectionRay,"refelected color: ", cr);
 
-    double R0 = pow(1-index_of_refraction/(1+index_of_refraction),2);
-    double R = R0 + (1-R0)* pow((1-cos1),5);
-    vec3 color = opacity * c0 + (1-opacity) * R * cr + (1-opacity)*(1-R) * ct;
+
+   if (cos2<=1)
+    {
+
+    }
+    else{
+        Pixel_Print("complete internal reflection");
+        return cr;
+    }
+    
+    vec3 ct = render_world.Cast_Ray(transparentRay,recursion_depth++);
+    color = opacity * c0 + (1-opacity) * R * cr + (1-opacity)*(1-R) * ct;
+        Pixel_Print("transmitted ray; ray: ",transparentRay,"transmitted color: ", ct ,"; Schlick reflectivity: ", R);
+
+    Pixel_Print("final color " , color);
+    
     return color;
 }

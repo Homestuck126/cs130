@@ -29,16 +29,18 @@ std::pair<Shaded_Object,Hit> Render_World::Closest_Intersection(const Ray& ray) 
     for(auto o:objects){
         objname = o.object->name;
         Hit temp = o.object->Intersection(ray, 0);
+        if(temp.Valid())
+        Pixel_Print("intersection test with " ,o.object->name, "; hit: ",hit);
+        else
+        Pixel_Print("no intersection with " ,o.object->name);
         if((temp.dist >= small_t) && temp.dist < min_t) 
         {
             min_t = temp.dist;
             object = o;
             hit = temp;
+
         }
-        if(hit.Valid())
-        Pixel_Print("intersection test with " ,o.object->name, "; hit: ",hit);
-        else
-        Pixel_Print("no intersection with " ,o.object->name);
+
     }
     Pixel_Print("closest intersection; obj: " ,objname, "; hit: ",hit);
     return {object,hit};
@@ -76,7 +78,6 @@ vec3 Render_World::Cast_Ray(const Ray& ray,int recursion_depth) const
         Pixel_Print("call Shade_Surface with location, ", point, "normal: ",temp.first.object->Normal(ray,temp.second));
         color =  temp.first.shader->Shade_Surface(*this,ray, temp.second,point,temp.first.object->Normal(ray,temp.second),recursion_depth);
     }
-
     else if(background_shader)
     {
     Hit temp;

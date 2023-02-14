@@ -16,6 +16,13 @@ Shade_Surface(const Render_World& render_world,const Ray& ray,const Hit& hit,
     const vec3& intersection_point,const vec3& normal,int recursion_depth) const
 {
     
+        if(recursion_depth > render_world.recursion_depth_limit)
+    {
+        if(render_world.background_shader)
+        return render_world.background_shader->Shade_Surface(render_world,ray,hit,vec3(0,0,0),vec3(0,0,0),recursion_depth);
+        else
+        return vec3(0,0,0);
+    }
     Debug_Scope scope;
     vec3 viewVector = -ray.direction.normalized();
     //refelect = 2 (v dot n) * n - v

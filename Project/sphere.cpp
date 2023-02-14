@@ -31,11 +31,11 @@ Hit Sphere::Intersection(const Ray& ray, int part) const
         return intersection;
     }
     //determine which one is smaller
-    if((sol1< sol2) && sol1>=small_t)
+    if((sol1< sol2 || sol2<small_t) && sol1>=small_t)
     {
         intersection.dist = sol1;
     }
-    else if((sol1 > sol2) && sol2>=small_t)
+    else if((sol1 > sol2|| sol1 < small_t) && sol2>=small_t)
     {
         intersection.dist = sol2;
     }

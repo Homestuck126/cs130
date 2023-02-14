@@ -22,8 +22,11 @@ Shade_Surface(const Render_World& render_world,const Ray& ray,const Hit& hit,
     const vec3& intersection_point,const vec3& normal,int recursion_depth) const
 {
     Debug_Scope scope;
-                if(recursion_depth == render_world.recursion_depth_limit)
+    if(recursion_depth > render_world.recursion_depth_limit)
     {
+        if(render_world.background_shader)
+        return render_world.background_shader->Shade_Surface(render_world,ray,hit,vec3(0,0,0),vec3(0,0,0),recursion_depth);
+        else
         return vec3(0,0,0);
     }
     vec3 color;
@@ -81,7 +84,7 @@ else
     vec3 reflectVector = 2 * dot (viewVector, normal) * normal - viewVector;
     Ray reflectionRay(intersection_point, reflectVector);
 
-    vec3 cr = render_world.Cast_Ray(reflectionRay,recursion_depth++);
+    vec3 cr = render_world.Cast_Ray(reflectionRay,recursion_depth+1);
     Pixel_Print("reflected ray; ray: ",reflectionRay,"refelected color: ", cr);
 
 
@@ -94,11 +97,11 @@ else
         return cr;
     }
     
-    vec3 ct = render_world.Cast_Ray(transparentRay,recursion_depth++);
+    vec3 ct = render_world.Cast_Ray(transparentRay,recursion_depth+1);
     color = opacity * c0 + (1-opacity) * R * cr + (1-opacity)*(1-R) * ct;
         Pixel_Print("transmitted ray; ray: ",transparentRay,"transmitted color: ", ct ,"; Schlick reflectivity: ", R);
 
     Pixel_Print("final color " , color);
-    
+
     return color;
 }

@@ -74,6 +74,14 @@ void Render_World::Render()
 // or the background color if there is no object intersection
 vec3 Render_World::Cast_Ray(const Ray& ray,int recursion_depth) const
 {
+    if(recursion_depth > recursion_depth_limit)
+    {
+        Hit temporary;
+        if(background_shader)
+        return background_shader->Shade_Surface(*this,ray,temporary,vec3(0,0,0),vec3(0,0,0),recursion_depth);
+        else
+        return vec3(0,0,0);
+    }
     Debug_Scope scope; 
         vec3 color(0,0,0);
     Pixel_Print("cast ray; ray: ",ray);

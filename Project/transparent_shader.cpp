@@ -22,6 +22,10 @@ Shade_Surface(const Render_World& render_world,const Ray& ray,const Hit& hit,
     const vec3& intersection_point,const vec3& normal,int recursion_depth) const
 {
     Debug_Scope scope;
+                if(recursion_depth == render_world.recursion_depth_limit)
+    {
+        return vec3(0,0,0);
+    }
     vec3 color;
     double n1;
     double n2;

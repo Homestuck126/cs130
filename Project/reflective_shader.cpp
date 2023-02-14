@@ -17,7 +17,6 @@ Shade_Surface(const Render_World& render_world,const Ray& ray,const Hit& hit,
 {
     
     Debug_Scope scope;
-
     vec3 viewVector = -ray.direction.normalized();
     //refelect = 2 (v dot n) * n - v
     vec3 reflectVector = 2 * dot (viewVector, normal) * normal - viewVector;

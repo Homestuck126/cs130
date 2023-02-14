@@ -60,7 +60,12 @@ void Render_World::Render()
 {
     for(int j=0;j<camera.number_pixels[1];j++)
         for(int i=0;i<camera.number_pixels[0];i++)
+        {
             Render_Pixel(ivec2(i,j));
+        }
+
+
+    
 }
 
 // Shade_Surface(const Render_World& render_world,const Ray& ray,const Hit& hit,const vec3& intersection_point,const vec3& normal,int recursion_depth)
@@ -70,9 +75,9 @@ void Render_World::Render()
 vec3 Render_World::Cast_Ray(const Ray& ray,int recursion_depth) const
 {
     Debug_Scope scope; 
+        vec3 color(0,0,0);
     Pixel_Print("cast ray; ray: ",ray);
     std::pair<Shaded_Object, Hit>  temp = Closest_Intersection(ray);
-    vec3 color(0,0,0);
     if ( temp.second.Valid()) {
         vec3 point = ray.Point(temp.second.dist);
         Pixel_Print("call Shade_Surface with location, ", point, "normal: ",temp.first.object->Normal(ray,temp.second));
@@ -83,6 +88,5 @@ vec3 Render_World::Cast_Ray(const Ray& ray,int recursion_depth) const
     Hit temp;
     color = background_shader->Shade_Surface(*this,ray,temp,vec3(0,0,0),vec3(0,0,0),recursion_depth);
     }
- 
     return color;
 }

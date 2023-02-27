@@ -1,5 +1,5 @@
 #include "flat_shader.h"
-// #include "mesh.h"
+#include "mesh.h"
 #include "parse.h"
 #include "phong_shader.h"
 #include "plane.h"
@@ -13,7 +13,7 @@ void Setup_Parsing(Parse& parse)
 {
     parse.template Register_Object<Sphere>();
     parse.template Register_Object<Plane>();
-//     parse.template Register_Object<Mesh>();
+    parse.template Register_Object<Mesh>();
 
      parse.template Register_Light<Point_Light>();
 

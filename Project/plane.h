@@ -10,7 +10,9 @@ class Plane : public Object
 public:
     vec3 x;
     vec3 normal;
-
+    Plane(vec3& point, vec3& normal) : x(point),normal(normal.normalized())
+    {
+    }
     Plane(const Parse* parse,std::istream& in);
     virtual ~Plane() = default;
 

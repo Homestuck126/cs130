@@ -1,4 +1,5 @@
 #include "mesh.h"
+#include "plane.h"
 #include <fstream>
 #include <limits>
 #include <string>
@@ -60,18 +61,52 @@ void Mesh::Read_Obj(const char* file)
 }
 
 // Check for an intersection against the ray.  See the base class for details.
+//If part>=0, intersect only against part of the
+    // primitive.  This is only used for meshes, where part is the triangle
+    // index.  If part<0, intersect against all triangles.  For other
+    // primitives, part is ignored.
 Hit Mesh::Intersection(const Ray& ray, int part) const
 {
-    TODO;
-    return {};
+    Hit hit;
+    if (part>=0)
+    {
+    hit = Intersect_Triangle(ray,part);
+    }
+    else
+    {
+        hit.dist = std::numeric_limits<int>::max();
+        for(int i = 0; i<triangles.size(); i++)
+        {
+            Hit temp = Intersect_Triangle(ray,i);
+            if(temp.dist > -1 && temp.dist<hit.dist)
+            {
+                hit.uv = temp.uv;
+                hit.dist = temp.dist;
+                hit.triangle = temp.triangle;
+            }
+        }
+    }
+    if(hit.dist<std::numeric_limits<int>::max())
+    return hit;
+    else
+    {
+        Hit temp;
+        return temp;
+    }
 }
 
 // Compute the normal direction for the triangle with index part.
 vec3 Mesh::Normal(const Ray& ray, const Hit& hit) const
 {
-    assert(hit.triangle>=0);
-    TODO;
-    return vec3();
+    double temp = hit.triangle;
+    //assert(temp>=0);
+	vec3 A = vertices[triangles[temp][0]];
+	vec3 B = vertices[triangles[temp][1]];
+	vec3 C = vertices[triangles[temp][2]];
+    vec3 B_A = B-A;
+    vec3 C_A = C-A;
+    vec3 norm = cross(B_A,C_A).normalized();
+    return norm;
 }
 
 // This is a helper routine whose purpose is to simplify the implementation
@@ -88,8 +123,52 @@ vec3 Mesh::Normal(const Ray& ray, const Hit& hit) const
 // two triangles.
 Hit Mesh::Intersect_Triangle(const Ray& ray, int tri) const
 {
-    TODO;
-    return {};
+    
+    Hit hit;
+    Debug_Scope scope; 
+
+	vec3 A = vertices[triangles[tri][0]];
+	vec3 B = vertices[triangles[tri][1]];
+	vec3 C = vertices[triangles[tri][2]];
+    //area of triangle is 1/2 || (B-A) X (C-A)||
+    vec3 B_A = B-A;
+    vec3 C_A = C-A;
+
+    vec3 norm = cross(B_A,C_A).normalized();
+
+    double area = .5 * dot( cross(B_A,C_A), norm);
+    Plane p(A,norm);
+	hit = p.Intersection(ray, tri);
+    if(!hit.Valid()){
+    return hit;
+    }
+
+if(hit.Valid())
+{
+    //f(x) = (X-A) dot n = 0
+    vec3 intersectionpoint = ray.Point(hit.dist);
+    double Alpha =.5 * dot(cross(B-intersectionpoint,C-intersectionpoint ),norm)/area;
+    double Beta = .5 *dot(cross(intersectionpoint-A,C-A ),norm)/area;
+    double Gamma = 1- Alpha - Beta;
+    Pixel_Print("Mesh ",dot(cross(B-intersectionpoint,C-intersectionpoint ),norm), " triangle " , tri, " weights: (" ,Alpha, " ", Beta, " ", Gamma, "); dist ", hit.dist);
+    if(Alpha >= -small_t && Beta >= -small_t && Gamma >= -small_t)
+    {
+        hit.uv = vec2(Alpha,Beta);
+        hit.triangle= tri;
+    }
+    else
+    {
+    Hit temp;
+    return temp;
+    }
+}
+else
+{
+    Hit temp;
+    return temp;
+}
+
+    return hit;
 }
 
 std::pair<Box,bool> Mesh::Bounding_Box(int part) const

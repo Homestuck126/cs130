@@ -29,7 +29,7 @@ Shade_Surface(const Render_World& render_world,const Ray& ray,const Hit& hit,
         color = vec3(0,0,0);
     }
     else
-    color = render_world.ambient_color->Get_Color(temp) * render_world.ambient_intensity * color_ambient->Get_Color(temp);
+    color = render_world.ambient_color->Get_Color(hit.uv) * render_world.ambient_intensity * color_ambient->Get_Color(hit.uv);
     Debug_Scope scope;
     Pixel_Print("ambient: ", color);
     //PhongLight = L_ambient*R_ambient + L_diffuse*R_diffuse* max(dot(normal,l),0) + R_specular* L_specular * pow(max(cos(phi),0),alpha) 

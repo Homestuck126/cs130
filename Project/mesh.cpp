@@ -134,6 +134,7 @@ Hit Mesh::Intersect_Triangle(const Ray& ray, int tri) const
     vec3 B_A = B-A;
     vec3 C_A = C-A;
 
+
     vec3 norm = cross(B_A,C_A).normalized();
 
     double area = .5 * dot( cross(B_A,C_A), norm);
@@ -153,7 +154,16 @@ if(hit.Valid())
     Pixel_Print("Mesh ",dot(cross(B-intersectionpoint,C-intersectionpoint ),norm), " triangle " , tri, " weights: (" ,Alpha, " ", Beta, " ", Gamma, "); dist ", hit.dist);
     if(Alpha >= -small_t && Beta >= -small_t && Gamma >= -small_t)
     {
-        hit.uv = vec2(Alpha,Beta);
+        vec2 uA = uvs[triangle_texture_index[tri][0]];
+        vec2 uB = uvs[triangle_texture_index[tri][1]];
+        vec2 uC = uvs[triangle_texture_index[tri][2]];
+        vec2 vA = uvs[triangle_texture_index[tri][0]];
+        vec2 vB = uvs[triangle_texture_index[tri][1]];
+        vec2 vC = uvs[triangle_texture_index[tri][2]];
+        vec2 UV;
+        UV[0] = Alpha * uA[0] + Beta * uB[0] + Gamma * uC[0];
+        UV[1] = Alpha * vA[1] + Beta * vB[1] + Gamma * vC[1];
+        hit.uv = UV;
         hit.triangle= tri;
     }
     else
